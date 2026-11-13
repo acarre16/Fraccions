@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Taller de les Fraccions — 5è de Primària</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Fredoka', 'sans-serif'],
+            sans: ['Nunito', 'sans-serif'],
+          },
+          colors: {
+            navy: '#1E3A8A',
+            navyDark: '#172554',
+            coral: '#F97316',
+            coralDark: '#EA580C',
+            mint: '#10B981',
+            mintDark: '#059669',
+            sun: '#FACC15',
+            plum: '#7C3AED',
+            plumDark: '#5B21B6',
+            cream: '#F8FAFC'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #F0F6FF;
+      background-image: radial-gradient(#CBD5E1 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+      color: #1E293B;
+      font-family: 'Nunito', sans-serif;
+    }
+    .font-display { font-family: 'Fredoka', sans-serif; }
+    .card-box {
+      background: #FFFFFF;
+      border: 2px solid #E2E8F0;
+      box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.08);
+    }
+    .fraction-stack {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      line-height: 1.05;
+      font-weight: 800;
+    }
+    .fraction-bar {
+      width: 100%;
+      min-width: 1.4em;
+      height: 3px;
+      background-color: currentColor;
+      border-radius: 99px;
+      margin: 2px 0;
+    }
+    .pop-in {
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .nav-pill-active {
+      background-color: #1E3A8A !important;
+      color: #FFFFFF !important;
+      border-color: #1E3A8A !important;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+      transform: translateY(-1px);
+    }
+    @media print {
+      body { background: #FFFFFF !important; }
+      header, nav, .no-print { display: none !important; }
+      #tab-diploma { display: block !important; }
+      #diploma-sheet {
+        border: 4px solid #1E3A8A !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- CAPÇALERA SUPERIOR -->
+  <header class="bg-gradient-to-r from-navyDark via-navy to-blue-800 text-white border-b-4 border-coral shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-coral text-white flex items-center justify-center text-2xl font-display font-bold shadow-md">
+          🍕
+        </div>
+        <div>
+          <h1 class="font-display text-xl sm:text-2xl font-bold tracking-wide text-white">
+            El Taller de les Fraccions
+          </h1>
+          <p class="text-xs sm:text-sm text-blue-200 font-semibold">Matemàtiques · 5è de Primària · Fitxa Interactiva</p>
+        </div>
+      </div>
+
+      <!-- MARCADOR DE PUNTS I PROGRÉS -->
+      <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/20 w-full sm:w-auto justify-between sm:justify-end">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">⭐</span>
+          <div>
+            <div class="text-[11px] uppercase tracking-wider text-blue-200 font-bold">Puntuació i Progrés</div>
+            <div class="font-display font-bold text-sun text-lg leading-none">
+              <span id="score-display">0</span> <span class="text-xs text-white font-sans">/ <span id="max-score-display">29</span> punts</span>
+            </div>
+            <div class="w-28 h-2 bg-white/20 rounded-full overflow-hidden mt-1.5">
+              <div id="global-progress-bar" class="h-full bg-sun transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="h-8 w-[1px] bg-white/20"></div>
+        <button onclick="resetAllExercises()" class="px-3 py-2 rounded-xl bg-coral hover:bg-coralDark text-white font-bold text-xs sm:text-sm shadow transition flex items-center gap-1.5" title="Generar exercicis nous">
+          <span>🔄</span> Nous exercicis
+        </button>
+      </div>
+    </div>
+
+    <!-- NAVEGACIÓ PER PESTANYES -->
+    <nav class="bg-white border-t border-slate-200 px-3 py-2.5 overflow-x-auto">
+      <div class="max-w-7xl mx-auto flex items-center justify-start xl:justify-center gap-2 min-w-max">
+        <button onclick="switchTab('explora')" id="btn-tab-explora" class="tab-btn nav-pill-active px-3.5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 border-slate-200 bg-slate-50 text-slate-700 hover:bg-blue-50 transition flex items-center gap-1.5">
+          <span>🔬</span> 1. Explora
+        </button>
+        <button onclick="switchTab('act1')" id="btn-tab-act1" class="tab-btn px-3.5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 border-slate-200 bg-slate-50 text-slate-700 hover:bg-blue-50 transition flex items-center gap-1.5">
+          <span>🎨</span> 2. Pinta i identifica <span id="badge-act1" class="px-2 py-0.5 rounded-full text-xs bg-slate-200 text-slate-700">0/5</span>
+        </button>
+        <button onclick="switchTab('act2')" id="btn-tab-act2" class="tab-btn px-3.5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 border-slate-200 bg-slate-50 text-slate-700 hover:bg-blue-50 transition flex items-center gap-1.5">
+          <span>⚖️</span> 3. Compara <span id="badge-act2" class="px-2 py-0.5 rounded-full text-xs bg-slate-200 text-slate-700">0/6</span>
+        </button>
+        <button onclick="switchTab('act3')" id="btn-tab-act3" class="tab-btn px-3.5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 border-slate-200 bg-slate-50 text-slate-700 hover:bg-blue-50 transition flex items-center gap-1.5">
+          <span>🧮</span> 4. Igual denom. <span id="badge-act3" class="px-2 py-0.5 rounded-full text-xs bg-slate-200 text-slate-700">0/8</span>
+        </button>
+        <button onclick="switchTab('diffden')" id="btn-tab-diffden" class="tab-btn px-3.5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 border-purple-300 bg-purple-50 text-plumDark hover:bg-purple-100 transition flex items-center gap-1.5">
+          <span>🚀</span> 5. Diferent denom. <span id="badge-diffden" class="px-2 py-0.5 rounded-full text-xs bg-purple-200 text-plumDark">0/6</span>
+        </button>
+        <button onclick="switchTab('act4')" id="btn-tab-act4" class="tab-btn px-3.5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 border-slate-200 bg-slate-50 text-slate-700 hover:bg-blue-50 transition flex items-center gap-1.5">
+          <span>🧩</span> 6. Problemes <span id="badge-act4" class="px-2 py-0.5 rounded-full text-xs bg-slate-200 text-slate-700">0/4</span>
+        </button>
+        <button onclick="switchTab('diploma')" id="btn-tab-diploma" class="tab-btn px-3.5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm border-2 border-mint bg-emerald-50 text-emerald-900 hover:bg-emerald-100 transition flex items-center gap-1.5">
+          <span>🏆</span> 7. Diploma
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- CONTINGUT PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓ 1: EXPLORA I COMPRÈN (VISUALITZADOR INTERACTIU)                -->
+    <!-- ===================================================================== -->
+    <section id="tab-explora" class="tab-section space-y-6">
+      <div class="card-box rounded-3xl p-6 bg-gradient-to-r from-blue-50 via-white to-amber-50">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="inline-block px-3 py-1 rounded-full bg-navy/10 text-navy font-extrabold text-xs uppercase tracking-wider mb-1">Laboratori Visual</span>
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy">Explora i comprèn les fraccions</h2>
+            <p class="text-slate-600 mt-1">Canvia el <strong>numerador</strong> i el <strong>denominador</strong> per observar com es dibuixa, com es llegeix i quin tipus de fracció és.</p>
+          </div>
+          <button onclick="toggleEquivalentsModal()" class="px-5 py-3 rounded-2xl bg-coral hover:bg-coralDark text-white font-extrabold text-sm shadow-md transition flex items-center gap-2 self-start">
+            <span>✨</span> Veure fraccions equivalents
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- CONTROLS NUMERADOR I DENOMINADOR (5 cols) -->
+        <div class="lg:col-span-5 card-box rounded-3xl p-6 flex flex-col justify-between space-y-6">
+          <div class="space-y-5">
+            <!-- Control Numerador -->
+            <div class="p-4 rounded-2xl bg-orange-50 border-2 border-orange-200">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <span class="font-display font-bold text-lg text-coralDark">Numerador</span>
+                  <p class="text-xs text-slate-600">Parts que agafem o pintem</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="changeLabFraction('num', -1)" class="w-11 h-11 rounded-xl bg-white border-2 border-orange-300 hover:bg-orange-100 font-extrabold text-xl text-coralDark shadow-sm active:scale-95">−</button>
+                  <span id="lab-num-val" class="w-11 text-center font-display font-bold text-3xl text-coralDark">3</span>
+                  <button onclick="changeLabFraction('num', 1)" class="w-11 h-11 rounded-xl bg-coral hover:bg-coralDark text-white font-extrabold text-xl shadow-sm active:scale-95">+</button>
+                </div>
+              </div>
+              <input id="lab-num-slider" type="range" min="1" max="12" value="3" oninput="setLabFraction('num', this.value)" class="w-full accent-orange-500 cursor-pointer">
+            </div>
+
+            <!-- Control Denominador -->
+            <div class="p-4 rounded-2xl bg-blue-50 border-2 border-blue-200">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <span class="font-display font-bold text-lg text-navy">Denominador</span>
+                  <p class="text-xs text-slate-600">Parts iguals en què dividim la unitat</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="changeLabFraction('den', -1)" class="w-11 h-11 rounded-xl bg-white border-2 border-blue-300 hover:bg-blue-100 font-extrabold text-xl text-navy shadow-sm active:scale-95">−</button>
+                  <span id="lab-den-val" class="w-11 text-center font-display font-bold text-3xl text-navy">4</span>
+                  <button onclick="changeLabFraction('den', 1)" class="w-11 h-11 rounded-xl bg-navy hover:bg-navyDark text-white font-extrabold text-xl shadow-sm active:scale-95">+</button>
+                </div>
+              </div>
+              <input id="lab-den-slider" type="range" min="1" max="12" value="4" oninput="setLabFraction('den', this.value)" class="w-full accent-blue-800 cursor-pointer">
+            </div>
+          </div>
+
+          <!-- Targeta de Lectura i Classificació -->
+          <div class="p-5 rounded-2xl bg-slate-900 text-white space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs uppercase tracking-wider text-blue-300 font-bold">Lectura en català</span>
+              <span id="lab-type-badge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-mint text-white">Fracció pròpia</span>
+            </div>
+            <div id="lab-reading" class="font-display text-2xl sm:text-3xl font-bold text-sun capitalize">
+              Tres quarts
+            </div>
+            <p id="lab-type-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              És més petita que la unitat (1) perquè el numerador és més petit que el denominador.
+            </p>
+          </div>
+        </div>
+
+        <!-- REPRESENTACIÓ GRÀFICA SIMULTÀNIA (7 cols) -->
+        <div class="lg:col-span-7 card-box rounded-3xl p-6 flex flex-col justify-between space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-display text-xl font-bold text-navy">Representació Gràfica</h3>
+            <div class="flex items-center gap-2 bg-amber-100 px-4 py-1.5 rounded-2xl border border-amber-300">
+              <span class="text-sm font-bold text-amber-900">Fracció:</span>
+              <div class="fraction-stack text-xl text-navy">
+                <span id="lab-frac-top">3</span>
+                <span class="fraction-bar"></span>
+                <span id="lab-frac-bot">4</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cercle (Pizza/Pastís) -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-extrabold text-slate-700">🍕 Model circular (Pastís / Pizza)</span>
+              <span id="lab-units-note" class="text-xs font-bold text-coralDark">1 unitat</span>
+            </div>
+            <div id="lab-circle-container" class="flex flex-wrap items-center justify-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 min-h-[175px]"></div>
+          </div>
+
+          <!-- Barra rectangular -->
+          <div class="space-y-2">
+            <span class="text-sm font-extrabold text-slate-700 block">🍫 Model rectangular (Rajola de xocolata)</span>
+            <div id="lab-bar-container" class="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANELL DESPLEGABLE DE FRACCIONS EQUIVALENTS -->
+      <div id="equivalents-panel" class="hidden pop-in card-box rounded-3xl p-6 border-2 border-coral bg-orange-50/60 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-display text-xl font-bold text-navy">✨ Fraccions Equivalents Visuals</h3>
+            <p class="text-sm text-slate-700">Les fraccions equivalents representen <strong>exactament la mateixa quantitat</strong> encara que tinguin nombres diferents!</p>
+          </div>
+          <button onclick="toggleEquivalentsModal()" class="px-3 py-1.5 rounded-xl bg-white border border-slate-300 font-bold text-xs text-slate-700 hover:bg-slate-100">✕ Tanca</button>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button onclick="renderEquivalentsExample(1, 2)" class="px-4 py-2 rounded-xl bg-navy text-white font-bold text-sm">Exemple: 1/2 = 2/4 = 4/8</button>
+          <button onclick="renderEquivalentsExample(1, 3)" class="px-4 py-2 rounded-xl bg-white border border-slate-300 text-slate-800 hover:bg-blue-50 font-bold text-sm">Exemple: 1/3 = 2/6 = 3/9</button>
+          <button onclick="renderEquivalentsExample(2, 3)" class="px-4 py-2 rounded-xl bg-white border border-slate-300 text-slate-800 hover:bg-blue-50 font-bold text-sm">Exemple: 2/3 = 4/6 = 6/9</button>
+        </div>
+
+        <div id="equivalents-visual-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓ 2: ACTIVITAT 1 - PINTA I IDENTIFICA                            -->
+    <!-- ===================================================================== -->
+    <section id="tab-act1" class="tab-section hidden space-y-6">
+      <div class="card-box rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-coral/15 text-coralDark font-extrabold text-xs uppercase tracking-wider mb-1">Activitat 1 · 5 Exercicis</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy">Pinta i identifica fraccions</h2>
+          <p class="text-slate-600 mt-1">En alguns exercicis hauràs de clicar sobre les porcions per pintar-les, i en d'altres escriure el numerador i el denominador.</p>
+        </div>
+        <button onclick="generateAct1()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm border border-slate-300 self-start">🎲 Altres dibuixos</button>
+      </div>
+
+      <div id="act1-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓ 3: ACTIVITAT 2 - COMPARACIÓ I ORDENACIÓ                        -->
+    <!-- ===================================================================== -->
+    <section id="tab-act2" class="tab-section hidden space-y-6">
+      <div class="card-box rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-mint/15 text-mintDark font-extrabold text-xs uppercase tracking-wider mb-1">Activitat 2 · 6 Exercicis</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy">Comparació i ordenació de fraccions</h2>
+          <p class="text-slate-600 mt-1">Compara les parelles triant <strong>&lt;</strong> (més petit), <strong>=</strong> (igual) o <strong>&gt;</strong> (més gran). Si tens dubtes, fes servir la pista visual!</p>
+        </div>
+        <button onclick="generateAct2()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm border border-slate-300 self-start">🎲 Nous reptes</button>
+      </div>
+
+      <!-- 5 parelles de comparació -->
+      <div id="act2-pairs-container" class="grid grid-cols-1 lg:grid-cols-2 gap-5"></div>
+
+      <!-- 1 exercici d'ordenar 4 fraccions -->
+      <div id="act2-order-container" class="card-box rounded-3xl p-6 border-2 border-navy/20"></div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓ 4: ACTIVITAT 3 - FRACCIÓ D'UNA QUANTITAT I CÀLCUL              -->
+    <!-- ===================================================================== -->
+    <section id="tab-act3" class="tab-section hidden space-y-6">
+      <div class="card-box rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-navy/10 text-navy font-extrabold text-xs uppercase tracking-wider mb-1">Activitat 3 · 8 Exercicis</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy">Fracció d'una quantitat i operacions</h2>
+          <p class="text-slate-600 mt-1">Calcula la fracció d'un nombre ajudant-te dels grups de fitxes i resol sumes i restes amb el mateix denominador.</p>
+        </div>
+        <button onclick="generateAct3()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm border border-slate-300 self-start">🎲 Nous càlculs</button>
+      </div>
+
+      <!-- Bloc A: Fracció d'una quantitat (4 exercicis) -->
+      <div class="space-y-3">
+        <h3 class="font-display text-xl font-bold text-coralDark flex items-center gap-2">
+          <span>🔵</span> Part A: Fracció d'una quantitat (Divideix pel denominador i multiplica pel numerador)
+        </h3>
+        <div id="act3-qty-container" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+      </div>
+
+      <!-- Bloc B: Sumes i restes d'igual denominador (4 exercicis) -->
+      <div class="space-y-3 pt-2">
+        <h3 class="font-display text-xl font-bold text-navy flex items-center gap-2">
+          <span>➕➖</span> Part B: Sumes i restes de fraccions amb el mateix denominador
+        </h3>
+        <div id="act3-ops-container" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓ 5 (NOVA): OPERACIONS AMB DIFERENT DENOMINADOR                  -->
+    <!-- ===================================================================== -->
+    <section id="tab-diffden" class="tab-section hidden space-y-8">
+      <!-- Capçalera del mòdul -->
+      <div class="card-box rounded-3xl p-6 bg-gradient-to-r from-purple-50 via-white to-blue-50 border-2 border-purple-200">
+        <span class="inline-block px-3 py-1 rounded-full bg-plum/15 text-plumDark font-extrabold text-xs uppercase tracking-wider mb-1">Nivell Avançat · 5è de Primària</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy">Sumar, restar i multiplicar fraccions amb diferent denominador</h2>
+        <p class="text-slate-700 mt-1 max-w-4xl">Quan les fraccions tenen <strong>denominadors diferents</strong>, les porcions no tenen la mateixa mida! Aprèn el truc visual per operar-les sense dificultat.</p>
+      </div>
+
+      <!-- 3 BLOCS D'EXPLICACIÓ VISUAL PAS A PAS -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- BLOC A: SUMAR AMB DIFERENT DENOMINADOR -->
+        <div class="card-box rounded-3xl p-6 border-t-8 border-coral flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full bg-orange-100 text-coralDark font-extrabold text-xs">A. Suma (+)</span>
+              <span class="text-2xl">➕</span>
+            </div>
+            <h3 class="font-display text-xl font-bold text-navy">Sumar amb diferent denominador</h3>
+            <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-amber-950 font-semibold">
+              ⚠️ <strong>Per què no es sumen directe?</strong> Perquè no podem sumar <em>meitats</em> amb <em>terços</em> com si fossin iguals; els trossos tenen mides diferents!
+            </div>
+
+            <ol class="space-y-2 text-xs sm:text-sm text-slate-700">
+              <li><strong class="text-coralDark">Pas 1 · Denominador comú:</strong> Busquem un nombre que sigui múltiple dels dos denominadors (per exemple, multiplicant-los: 2 × 3 = <strong>6</strong>).</li>
+              <li><strong class="text-coralDark">Pas 2 · Fraccions equivalents:</strong> Transformem cada fracció perquè tingui el nou denominador multiplicant a dalt i a baix pel mateix nombre.</li>
+              <li><strong class="text-coralDark">Pas 3 · Sumem a dalt:</strong> Ara que els trossos són iguals, sumem els numeradors i deixem el denominador comú!</li>
+            </ol>
+          </div>
+
+          <!-- Exemple Visual 1/2 + 1/3 = 5/6 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border-2 border-orange-200 space-y-3">
+            <div class="text-xs font-extrabold uppercase text-coralDark text-center">Exemple Visual: 1/2 + 1/3</div>
+            <div class="space-y-2 text-xs font-bold">
+              <div class="flex items-center justify-between gap-2">
+                <span class="w-16 text-navy">1/2 = 3/6</span>
+                <div class="flex-1 flex border-2 border-navy rounded-lg overflow-hidden h-6">
+                  <div class="flex-1 bg-coral border-r border-dashed border-white"></div>
+                  <div class="flex-1 bg-coral border-r border-dashed border-white"></div>
+                  <div class="flex-1 bg-coral border-r-2 border-navy"></div>
+                  <div class="flex-1 bg-white border-r border-dashed border-slate-300"></div>
+                  <div class="flex-1 bg-white border-r border-dashed border-slate-300"></div>
+                  <div class="flex-1 bg-white"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="w-16 text-navy">1/3 = 2/6</span>
+                <div class="flex-1 flex border-2 border-navy rounded-lg overflow-hidden h-6">
+                  <div class="flex-1 bg-blue-500 border-r border-dashed border-white"></div>
+                  <div class="flex-1 bg-blue-500 border-r-2 border-navy"></div>
+                  <div class="flex-1 bg-white border-r border-dashed border-slate-300"></div>
+                  <div class="flex-1 bg-white border-r-2 border-navy"></div>
+                  <div class="flex-1 bg-white border-r border-dashed border-slate-300"></div>
+                  <div class="flex-1 bg-white"></div>
+                </div>
+              </div>
+              <div class="pt-1 border-t border-slate-200 flex items-center justify-between gap-2">
+                <span class="w-16 text-mintDark font-extrabold">Total: 5/6</span>
+                <div class="flex-1 flex border-2 border-navy rounded-lg overflow-hidden h-7">
+                  <div class="flex-1 bg-coral border-r border-navy"></div>
+                  <div class="flex-1 bg-coral border-r border-navy"></div>
+                  <div class="flex-1 bg-coral border-r border-navy"></div>
+                  <div class="flex-1 bg-blue-500 border-r border-navy"></div>
+                  <div class="flex-1 bg-blue-500 border-r border-navy"></div>
+                  <div class="flex-1 bg-white"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOC B: RESTAR AMB DIFERENT DENOMINADOR -->
+        <div class="card-box rounded-3xl p-6 border-t-8 border-navy flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full bg-blue-100 text-navy font-extrabold text-xs">B. Resta (−)</span>
+              <span class="text-2xl">➖</span>
+            </div>
+            <h3 class="font-display text-xl font-bold text-navy">Restar amb diferent denominador</h3>
+            <div class="p-3 rounded-2xl bg-blue-50 border border-blue-200 text-xs sm:text-sm text-navy font-semibold">
+              💡 <strong>Mateix mètode que la suma!</strong> Per treure una part d'una altra, primer hem d'aconseguir que totes dues tinguin el <strong>mateix denominador</strong>.
+            </div>
+
+            <ol class="space-y-2 text-xs sm:text-sm text-slate-700">
+              <li><strong class="text-navy">Pas 1 · Denominador comú:</strong> Busquem un múltiple comú dels dos denominadors (ex: entre 4 i 2, el denominador comú és <strong>4</strong>).</li>
+              <li><strong class="text-navy">Pas 2 · Fraccions equivalents:</strong> Convertim 1/2 en quarts multiplicant a dalt i a baix per 2 → <strong>2/4</strong>.</li>
+              <li><strong class="text-navy">Pas 3 · Restem a dalt:</strong> Restem els numeradors (3 − 2 = 1) i mantenim el denominador 4!</li>
+            </ol>
+          </div>
+
+          <!-- Exemple Visual 3/4 - 1/2 = 1/4 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border-2 border-blue-200 space-y-3">
+            <div class="text-xs font-extrabold uppercase text-navy text-center">Exemple Visual: 3/4 − 1/2</div>
+            <div class="space-y-2 text-xs font-bold">
+              <div class="flex items-center justify-between gap-2">
+                <span class="w-16 text-navy">Tenim 3/4</span>
+                <div class="flex-1 flex border-2 border-navy rounded-lg overflow-hidden h-6">
+                  <div class="flex-1 bg-navy border-r border-white"></div>
+                  <div class="flex-1 bg-navy border-r border-white"></div>
+                  <div class="flex-1 bg-navy border-r border-navy"></div>
+                  <div class="flex-1 bg-white"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="w-16 text-coralDark">− 1/2 (2/4)</span>
+                <div class="flex-1 flex border-2 border-navy rounded-lg overflow-hidden h-6">
+                  <div class="flex-1 bg-red-200 border-r border-dashed border-red-400 flex items-center justify-center text-red-700">✕</div>
+                  <div class="flex-1 bg-red-200 border-r-2 border-navy flex items-center justify-center text-red-700">✕</div>
+                  <div class="flex-1 bg-white border-r border-slate-300"></div>
+                  <div class="flex-1 bg-white"></div>
+                </div>
+              </div>
+              <div class="pt-1 border-t border-slate-200 flex items-center justify-between gap-2">
+                <span class="w-16 text-mintDark font-extrabold">Queda 1/4</span>
+                <div class="flex-1 flex border-2 border-navy rounded-lg overflow-hidden h-7">
+                  <div class="flex-1 bg-slate-100 border-r border-slate-300"></div>
+                  <div class="flex-1 bg-slate-100 border-r border-slate-300"></div>
+                  <div class="flex-1 bg-mint border-r border-navy"></div>
+                  <div class="flex-1 bg-white"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOC C: MULTIPLICAR FRACCIONS -->
+        <div class="card-box rounded-3xl p-6 border-t-8 border-plum flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full bg-purple-100 text-plumDark font-extrabold text-xs">C. Multiplicació (×)</span>
+              <span class="text-2xl">✖️</span>
+            </div>
+            <h3 class="font-display text-xl font-bold text-navy">Multiplicar fraccions</h3>
+            <div class="p-3 rounded-2xl bg-purple-50 border border-purple-200 text-xs sm:text-sm text-plumDark font-semibold">
+              🎉 <strong>Aquí és molt més directe!</strong> No cal buscar denominador comú. Multipliquem en línia recta!
+            </div>
+
+            <ol class="space-y-2 text-xs sm:text-sm text-slate-700">
+              <li><strong class="text-plumDark">A dalt (Numerador):</strong> Numerador × Numerador.</li>
+              <li><strong class="text-plumDark">A baix (Denominador):</strong> Denominador × Denominador.</li>
+              <li><strong class="text-plumDark">Què significa?</strong> Calcular <strong>1/2 × 2/3</strong> vol dir trobar <em>«la meitat de dos terços»</em>!</li>
+            </ol>
+          </div>
+
+          <!-- Exemple Visual 1/2 × 2/3 = 2/6 (Quadrícula d'àrea) -->
+          <div class="p-4 rounded-2xl bg-slate-50 border-2 border-purple-200 space-y-2">
+            <div class="text-xs font-extrabold uppercase text-plumDark text-center">Exemple Visual: 1/2 × 2/3 = 2/6</div>
+            <div class="flex items-center justify-center gap-4">
+              <!-- Quadrícula 2 files x 3 columnes -->
+              <div class="grid grid-cols-3 border-2 border-navy rounded-lg overflow-hidden w-36 h-24 shadow-sm">
+                <div class="bg-plum border-r border-b border-navy flex items-center justify-center text-white text-xs font-bold">1</div>
+                <div class="bg-plum border-r border-b border-navy flex items-center justify-center text-white text-xs font-bold">2</div>
+                <div class="bg-amber-100 border-b border-navy"></div>
+                <div class="bg-blue-200 border-r border-navy"></div>
+                <div class="bg-blue-200 border-r border-navy"></div>
+                <div class="bg-white"></div>
+              </div>
+              <div class="text-xs space-y-1 font-bold text-slate-700">
+                <div>1 × 2 = <span class="text-plumDark">2</span> (a dalt)</div>
+                <div>2 × 3 = <span class="text-navy">6</span> (a baix)</div>
+                <div class="text-mintDark pt-1">Resultat: 2/6 (= 1/3)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LABORATORI / CALCULADORA VISUAL INTERACTIVA D'OPERACIONS -->
+      <div class="card-box rounded-3xl p-6 border-2 border-plum/40 bg-gradient-to-br from-white to-purple-50/50 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <span class="px-3 py-1 rounded-full bg-plum text-white font-extrabold text-xs uppercase">Eina Interactiva</span>
+            <h3 class="font-display text-2xl font-bold text-navy mt-1">Calculadora Visual Pas a Pas</h3>
+            <p class="text-sm text-slate-600">Tria dues fraccions i l'operació (<strong class="text-coralDark">+</strong>, <strong class="text-navy">−</strong> o <strong class="text-plumDark">×</strong>) per veure tot el procés explicat i dibuixat.</p>
+          </div>
+        </div>
+
+        <!-- Controls del laboratori d'operacions -->
+        <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm">
+          <!-- Fracció 1 -->
+          <div class="flex flex-col items-center bg-orange-50 p-3 rounded-2xl border border-orange-200">
+            <span class="text-[11px] font-extrabold text-coralDark uppercase mb-1">1a Fracció</span>
+            <select id="calc-n1" onchange="updateDiffDenLab()" class="w-16 h-10 text-center font-display font-bold text-lg border-2 border-coral rounded-xl bg-white">
+              <option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+            </select>
+            <div class="w-16 h-1 bg-navy my-1.5 rounded"></div>
+            <select id="calc-d1" onchange="updateDiffDenLab()" class="w-16 h-10 text-center font-display font-bold text-lg border-2 border-navy rounded-xl bg-white">
+              <option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            </select>
+          </div>
+
+          <!-- Selector Operació -->
+          <div class="flex flex-col items-center">
+            <span class="text-[11px] font-extrabold text-slate-500 uppercase mb-1">Operació</span>
+            <div class="flex gap-1.5">
+              <button onclick="setCalcOp('+')" id="calc-op-plus" class="calc-op-btn w-12 h-12 rounded-2xl bg-coral text-white font-display font-bold text-2xl shadow">+</button>
+              <button onclick="setCalcOp('-')" id="calc-op-minus" class="calc-op-btn w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-display font-bold text-2xl border border-slate-300">−</button>
+              <button onclick="setCalcOp('*')" id="calc-op-mult" class="calc-op-btn w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-display font-bold text-2xl border border-slate-300">×</button>
+            </div>
+          </div>
+
+          <!-- Fracció 2 -->
+          <div class="flex flex-col items-center bg-blue-50 p-3 rounded-2xl border border-blue-200">
+            <span class="text-[11px] font-extrabold text-navy uppercase mb-1">2a Fracció</span>
+            <select id="calc-n2" onchange="updateDiffDenLab()" class="w-16 h-10 text-center font-display font-bold text-lg border-2 border-coral rounded-xl bg-white">
+              <option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+            </select>
+            <div class="w-16 h-1 bg-navy my-1.5 rounded"></div>
+            <select id="calc-d2" onchange="updateDiffDenLab()" class="w-16 h-10 text-center font-display font-bold text-lg border-2 border-navy rounded-xl bg-white">
+              <option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Resultat pas a pas dinàmic -->
+        <div id="diffden-lab-output" class="space-y-4"></div>
+      </div>
+
+      <!-- PRÀCTICA GUIADA: 6 EXERCICIS INTERACTIUS -->
+      <div class="space-y-4">
+        <div class="card-box rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="inline-block px-3 py-1 rounded-full bg-plum/15 text-plumDark font-extrabold text-xs uppercase tracking-wider mb-1">Pràctica Guiada · 6 Exercicis</span>
+            <h3 class="font-display text-2xl font-bold text-navy">Posa't a prova pas a pas!</h3>
+            <p class="text-sm text-slate-600">Completa les caselles intermèdies (fraccions equivalents) en les sumes i restes, i multiplica en línia recta a les multiplicacions.</p>
+          </div>
+          <button onclick="generateDiffDenExercises()" class="px-4 py-2.5 rounded-xl bg-plum hover:bg-plumDark text-white font-bold text-sm shadow self-start">🎲 Generar nous exercicis</button>
+        </div>
+
+        <div id="diffden-exercises-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓ 6: PROBLEMES DE LA VIDA QUOTIDIANA                             -->
+    <!-- ===================================================================== -->
+    <section id="tab-act4" class="tab-section hidden space-y-6">
+      <div class="card-box rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full bg-amber-400/30 text-amber-900 font-extrabold text-xs uppercase tracking-wider mb-1">Activitat 5 · 4 Problemes</span>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy">Problemes de la vida quotidiana</h2>
+          <p class="text-slate-600 mt-1">Llegeix amb atenció cada situació real, observa el dibuix d'ajuda i resol el problema pas a pas.</p>
+        </div>
+        <button onclick="generateAct4()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm border border-slate-300 self-start">🎲 Nous problemes</button>
+      </div>
+
+      <div id="act4-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECCIÓ 7: RESUM I DIPLOMA FINAL                                       -->
+    <!-- ===================================================================== -->
+    <section id="tab-diploma" class="tab-section hidden space-y-6">
+      <div class="no-print card-box rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="w-full md:w-auto flex-1">
+          <label for="student-name-input" class="block text-xs font-extrabold uppercase text-navy mb-1">Escriu el teu nom i cognoms per al diploma:</label>
+          <input id="student-name-input" type="text" placeholder="Ex: Martina Puig i Soler" oninput="updateDiplomaPreview()" class="w-full max-w-md px-4 py-3 rounded-2xl border-2 border-slate-300 focus:border-navy outline-none font-bold text-slate-800 text-base">
+        </div>
+        <button onclick="window.print()" class="px-6 py-3.5 rounded-2xl bg-mint hover:bg-mintDark text-white font-extrabold text-base shadow-lg transition flex items-center gap-2 shrink-0">
+          <span>🖨️</span> Imprimeix o desa en PDF
+        </button>
+      </div>
+
+      <!-- FULL DEL DIPLOMA I INFORME D'AVALUACIÓ -->
+      <div id="diploma-sheet" class="card-box rounded-3xl p-6 sm:p-10 border-4 border-navy bg-gradient-to-b from-white via-blue-50/30 to-amber-50/40 space-y-6">
+        <div class="text-center space-y-2 border-b-2 border-slate-200 pb-6">
+          <div class="text-5xl">🏆🎓</div>
+          <span class="inline-block px-4 py-1 rounded-full bg-navy text-white font-extrabold text-xs uppercase tracking-widest">5è d'Educació Primària · Matemàtiques</span>
+          <h2 class="font-display text-3xl sm:text-4xl font-bold text-navy">Diploma del Taller de les Fraccions</h2>
+          <p class="text-slate-600 text-sm">Certificat de treball i aprenentatge interactiu</p>
+        </div>
+
+        <div class="text-center py-2">
+          <p class="text-sm uppercase tracking-wider text-slate-500 font-bold">Atorgat a l'alumne/a:</p>
+          <div id="diploma-student-name" class="font-display text-2xl sm:text-3xl font-bold text-coralDark mt-1 underline decoration-amber-400 decoration-4 underline-offset-8">
+            Alumne/a de 5è de Primària
+          </div>
+        </div>
+
+        <!-- Resultats per blocs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="p-4 rounded-2xl bg-white border-2 border-slate-200 text-center">
+            <div class="text-2xl mb-1">🎨</div>
+            <div class="text-xs font-extrabold text-slate-500 uppercase">Pinta i identifica</div>
+            <div id="rep-act1" class="font-display text-2xl font-bold text-navy mt-1">0 / 5</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white border-2 border-slate-200 text-center">
+            <div class="text-2xl mb-1">⚖️</div>
+            <div class="text-xs font-extrabold text-slate-500 uppercase">Compara i ordena</div>
+            <div id="rep-act2" class="font-display text-2xl font-bold text-navy mt-1">0 / 6</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white border-2 border-slate-200 text-center">
+            <div class="text-2xl mb-1">🧮</div>
+            <div class="text-xs font-extrabold text-slate-500 uppercase">Igual denominador</div>
+            <div id="rep-act3" class="font-display text-2xl font-bold text-navy mt-1">0 / 8</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-200 text-center">
+            <div class="text-2xl mb-1">🚀</div>
+            <div class="text-xs font-extrabold text-plumDark uppercase">Diferent denom.</div>
+            <div id="rep-diffden" class="font-display text-2xl font-bold text-plumDark mt-1">0 / 6</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white border-2 border-slate-200 text-center">
+            <div class="text-2xl mb-1">🧩</div>
+            <div class="text-xs font-extrabold text-slate-500 uppercase">Problemes</div>
+            <div id="rep-act4" class="font-display text-2xl font-bold text-navy mt-1">0 / 4</div>
+          </div>
+        </div>
+
+        <!-- Puntuació global i valoració pedagògica -->
+        <div class="p-6 rounded-2xl bg-navy text-white flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="space-y-1 text-center md:text-left">
+            <div class="text-xs uppercase tracking-wider text-blue-200 font-bold">Valoració final del taller</div>
+            <h3 id="diploma-grade-title" class="font-display text-2xl font-bold text-sun">Comença els exercicis per veure la teva nota!</h3>
+            <p id="diploma-feedback-text" class="text-sm text-blue-100 leading-relaxed max-w-2xl">
+              Completa les activitats de les pestanyes 2, 3, 4, 5 i 6 per obtenir el resum detallat dels teus punts forts.
+            </p>
+          </div>
+          <div class="bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-center shrink-0">
+            <div class="text-xs uppercase font-bold text-blue-200">Total encerts</div>
+            <div class="font-display text-4xl font-bold text-sun"><span id="diploma-total-score">0</span><span class="text-xl text-white">/29</span></div>
+          </div>
+        </div>
+
+        <!-- Puntuació global i valoració pedagògica -->
+        <div class="p-6 rounded-2xl bg-navy text-white flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="space-y-1 text-center md:text-left">
+            <div class="text-xs uppercase tracking-wider text-blue-200 font-bold">Valoració final del taller</div>
+            <h3 id="diploma-grade-title" class="font-display text-2xl font-bold text-sun">Comença els exercicis per veure la teva nota!</h3>
+            <p id="diploma-feedback-text" class="text-sm text-blue-100 leading-relaxed max-w-2xl">
+              Completa les activitats de les pestanyes 2, 3, 4 i 5 per obtenir el resum detallat dels teus punts forts.
+            </p>
+          </div>
+          <div class="bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-center shrink-0">
+            <div class="text-xs uppercase font-bold text-blue-200">Total encerts</div>
+            <div class="font-display text-4xl font-bold text-sun"><span id="diploma-total-score">0</span><span class="text-xl text-white">/23</span></div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-2">
+          <span id="diploma-date">Data: --/--/----</span>
+          <span>El Taller de les Fraccions · Cicle Superior</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="no-print bg-navyDark text-blue-200 text-center py-4 px-4 text-xs mt-10">
+    Recurs educatiu interactiu de Matemàtiques · 5è de Primària · Fraccions
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- LÒGICA JAVASCRIPT COMPLETA                                            -->
+  <!-- ===================================================================== -->
+  <script>
+    // -----------------------------------------------------------------------
+    // UTILITATS GENERALS I LECTURA DE FRACCIONS EN CATALÀ
+    // -----------------------------------------------------------------------
+    const numWords = ["", "un", "dos", "tres", "quatre", "cinc", "sis", "set", "vuit", "nou", "deu", "onze", "dotze"];
+    const denSingular = ["", "unitat", "mig", "terç", "quart", "cinquè", "sisè", "setè", "vuitè", "novè", "desè", "onzè", "dotzè"];
+    const denPlural = ["", "unitats", "meitats", "terços", "quarts", "cinquens", "sisens", "setens", "vuitens", "novens", "desens", "onzens", "dotzens"];
+
+    function readFractionCatalan(num, den) {
+      if (den === 1) return num === 1 ? "una unitat" : `${numWords[num]} unitats`;
+      const nText = numWords[num] || num;
+      const dText = num === 1 ? denSingular[den] : denPlural[den];
+      return `${nText} ${dText}`;
+    }
+
+    function fractionHTML(num, den, extraClass = "") {
+      return `<span class="fraction-stack ${extraClass}"><span>${num}</span><span class="fraction-bar"></span><span>${den}</span></span>`;
+    }
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Dibuix SVG d'un cercle dividit en `den` porcions amb `painted` pintades (o interactiu)
+    function createCircleSVG(den, paintedCount, size = 140, interactiveId = null, selectedSet = null) {
+      const cx = size / 2, cy = size / 2, r = (size / 2) - 6;
+      if (den === 1) {
+        const isFilled = interactiveId ? selectedSet.has(0) : paintedCount >= 1;
+        const clickAttr = interactiveId ? `onclick="toggleAct1Slice('${interactiveId}', 0)" style="cursor:pointer"` : "";
+        return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="${isFilled ? '#F97316' : '#F1F5F9'}" stroke="#1E3A8A" stroke-width="3" ${clickAttr}/>
+        </svg>`;
+      }
+
+      let paths = "";
+      for (let i = 0; i < den; i++) {
+        const startAngle = (i * 2 * Math.PI / den) - Math.PI / 2;
+        const endAngle = ((i + 1) * 2 * Math.PI / den) - Math.PI / 2;
+        const x1 = cx + r * Math.cos(startAngle);
+        const y1 = cy + r * Math.sin(startAngle);
+        const x2 = cx + r * Math.cos(endAngle);
+        const y2 = cy + r * Math.sin(endAngle);
+        const largeArc = (endAngle - startAngle) > Math.PI ? 1 : 0;
+
+        const isFilled = interactiveId ? selectedSet.has(i) : i < paintedCount;
+        const fillCol = isFilled ? "#F97316" : "#F8FAFC";
+        const clickAttr = interactiveId ? `onclick="toggleAct1Slice('${interactiveId}', ${i})" style="cursor:pointer"` : "";
+
+        paths += `<path d="M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z"
+          fill="${fillCol}" stroke="#1E3A8A" stroke-width="2.5" class="transition-colors hover:opacity-85" ${clickAttr}/>`;
+      }
+      return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="drop-shadow-sm">${paths}</svg>`;
+    }
+
+    // Dibuix de barra rectangular
+    function createBarHTML(den, paintedCount, interactiveId = null, selectedSet = null) {
+      let cells = "";
+      for (let i = 0; i < den; i++) {
+        const isFilled = interactiveId ? selectedSet.has(i) : i < paintedCount;
+        const clickAttr = interactiveId ? `onclick="toggleAct1Slice('${interactiveId}', ${i})"` : "";
+        const cursorClass = interactiveId ? "cursor-pointer hover:opacity-80" : "";
+        cells += `<div ${clickAttr} class="flex-1 h-11 border-r-2 last:border-r-0 border-navy transition-colors ${cursorClass} ${isFilled ? 'bg-coral' : 'bg-white'}"></div>`;
+      }
+      return `<div class="w-full max-w-md mx-auto flex border-2 border-navy rounded-xl overflow-hidden shadow-sm">${cells}</div>`;
+    }
+
+    // -----------------------------------------------------------------------
+    // ESTAT GLOBAL DE PUNTUACIÓ I NAVEGACIÓ
+    // -----------------------------------------------------------------------
+    const scores = { act1: 0, act2: 0, act3: 0, diffden: 0, act4: 0 };
+
+    function updateGlobalUI() {
+      const total = scores.act1 + scores.act2 + scores.act3 + scores.diffden + scores.act4;
+      const maxTotal = 29;
+      document.getElementById('score-display').textContent = total;
+      document.getElementById('global-progress-bar').style.width = `${Math.round((total / maxTotal) * 100)}%`;
+
+      document.getElementById('badge-act1').textContent = `${scores.act1}/5`;
+      document.getElementById('badge-act2').textContent = `${scores.act2}/6`;
+      document.getElementById('badge-act3').textContent = `${scores.act3}/8`;
+      document.getElementById('badge-diffden').textContent = `${scores.diffden}/6`;
+      document.getElementById('badge-act4').textContent = `${scores.act4}/4`;
+
+      // Actualitza diploma
+      document.getElementById('rep-act1').textContent = `${scores.act1} / 5`;
+      document.getElementById('rep-act2').textContent = `${scores.act2} / 6`;
+      document.getElementById('rep-act3').textContent = `${scores.act3} / 8`;
+      document.getElementById('rep-diffden').textContent = `${scores.diffden} / 6`;
+      document.getElementById('rep-act4').textContent = `${scores.act4} / 4`;
+      document.getElementById('diploma-total-score').textContent = total;
+
+      const titleEl = document.getElementById('diploma-grade-title');
+      const fbEl = document.getElementById('diploma-feedback-text');
+
+      if (total === 0) {
+        titleEl.textContent = "Comença els exercicis per veure la teva nota!";
+      } else if (total >= 25) {
+        titleEl.textContent = "Excel·lent! Ets un/a Mestre/a de les Fraccions 🌟";
+      } else if (total >= 18) {
+        titleEl.textContent = "Molt bona feina! Domines molt bé les fraccions 👏";
+      } else if (total >= 10) {
+        titleEl.textContent = "Bon progrés! Continua practicant per millorar 💪";
+      } else {
+        titleEl.textContent = "Bon començament! Fes servir el laboratori visual per repassar 🔍";
+      }
+
+      // Punts forts i àrees a repassar
+      const weak = [];
+      if (scores.act1 < 4) weak.push("representació gràfica");
+      if (scores.act2 < 4) weak.push("comparació i ordenació");
+      if (scores.act3 < 6) weak.push("fracció d'una quantitat i igual denominador");
+      if (scores.diffden < 4) weak.push("operacions amb diferent denominador");
+      if (scores.act4 < 3) weak.push("resolució de problemes");
+
+      if (total > 0) {
+        fbEl.textContent = weak.length === 0
+          ? "Has superat tots els blocs amb una precisió extraordinària. Enhorabona!"
+          : `Has aconseguit ${total} de ${maxTotal} punts possibles. Et recomanem continuar practicant: ${weak.join(', ')}.`;
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('nav-pill-active'));
+      document.getElementById('btn-tab-' + tabId).classList.add('nav-pill-active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateDiplomaPreview() {
+      const val = document.getElementById('student-name-input').value.trim();
+      document.getElementById('diploma-student-name').textContent = val || "Alumne/a de 5è de Primària";
+    }
+
+    // -----------------------------------------------------------------------
+    // 1. LABORATORI VISUAL INTERACTIU
+    // -----------------------------------------------------------------------
+    let labNum = 3, labDen = 4;
+
+    function changeLabFraction(part, delta) {
+      if (part === 'num') labNum = Math.min(12, Math.max(1, labNum + delta));
+      else labDen = Math.min(12, Math.max(1, labDen + delta));
+      renderLab();
+    }
+
+    function setLabFraction(part, val) {
+      if (part === 'num') labNum = parseInt(val, 10);
+      else labDen = parseInt(val, 10);
+      renderLab();
+    }
+
+    function renderLab() {
+      document.getElementById('lab-num-val').textContent = labNum;
+      document.getElementById('lab-den-val').textContent = labDen;
+      document.getElementById('lab-num-slider').value = labNum;
+      document.getElementById('lab-den-slider').value = labDen;
+      document.getElementById('lab-frac-top').textContent = labNum;
+      document.getElementById('lab-frac-bot').textContent = labDen;
+
+      // Lectura
+      document.getElementById('lab-reading').textContent = readFractionCatalan(labNum, labDen);
+
+      // Classificació
+      const badge = document.getElementById('lab-type-badge');
+      const desc = document.getElementById('lab-type-desc');
+      if (labNum < labDen) {
+        badge.textContent = "Fracció pròpia (< 1)";
+        badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-mint text-white";
+        desc.textContent = "És més petita que 1 unitat perquè el numerador és més petit que el denominador.";
+      } else if (labNum === labDen) {
+        badge.textContent = "Igual a la unitat (= 1)";
+        badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-sun text-navyDark";
+        desc.textContent = "Representa exactament 1 unitat sencera perquè agafem totes les parts en què l'hem dividida.";
+      } else if (labNum % labDen === 0) {
+        const units = labNum / labDen;
+        badge.textContent = `Fracció aparent (= ${units} unitats)`;
+        badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-purple-500 text-white";
+        desc.textContent = `És una fracció impròpia que equival exactament a ${units} unitats senceres (${labNum} ÷ ${labDen} = ${units}).`;
+      } else {
+        const whole = Math.floor(labNum / labDen);
+        const rem = labNum % labDen;
+        badge.textContent = "Fracció impròpia (> 1)";
+        badge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-coral text-white";
+        desc.textContent = `És més gran que la unitat! Necessitem més d'un pastís: equival a ${whole} unitat${whole > 1 ? 's' : ''} i ${rem}/${labDen}.`;
+      }
+
+      // Quantes unitats cal dibuixar
+      const totalUnits = Math.ceil(labNum / labDen);
+      document.getElementById('lab-units-note').textContent = totalUnits === 1 ? "1 unitat" : `${totalUnits} unitats necessàries`;
+
+      // Dibuix cercles
+      const circleBox = document.getElementById('lab-circle-container');
+      circleBox.innerHTML = "";
+      let remaining = labNum;
+      for (let u = 0; u < totalUnits; u++) {
+        const paintInThisUnit = Math.min(labDen, remaining);
+        remaining -= paintInThisUnit;
+        circleBox.innerHTML += createCircleSVG(labDen, paintInThisUnit, totalUnits > 2 ? 115 : 145);
+      }
+
+      // Dibuix barres
+      const barBox = document.getElementById('lab-bar-container');
+      barBox.innerHTML = "";
+      let remBar = labNum;
+      for (let u = 0; u < totalUnits; u++) {
+        const paintInThisBar = Math.min(labDen, remBar);
+        remBar -= paintInThisBar;
+        barBox.innerHTML += createBarHTML(labDen, paintInThisBar);
+      }
+    }
+
+    function toggleEquivalentsModal() {
+      const panel = document.getElementById('equivalents-panel');
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) {
+        renderEquivalentsExample(1, 2);
+      }
+    }
+
+    function renderEquivalentsExample(num, den) {
+      const grid = document.getElementById('equivalents-visual-grid');
+      grid.innerHTML = "";
+      [1, 2, 3].forEach(mult => {
+        const n = num * mult;
+        const d = den * mult;
+        grid.innerHTML += `
+          <div class="p-4 rounded-2xl bg-white border-2 border-orange-200 flex flex-col items-center space-y-2 shadow-sm">
+            ${createCircleSVG(d, n, 120)}
+            <div class="text-xl text-navy">${fractionHTML(n, d)}</div>
+            <div class="text-xs font-bold text-slate-600 capitalize">${readFractionCatalan(n, d)}</div>
+          </div>
+        `;
+      });
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. ACTIVITAT 1: PINTA I IDENTIFICA (5 EXERCICIS)
+    // -----------------------------------------------------------------------
+    let act1Data = [];
+
+    function generateAct1() {
+      scores.act1 = 0;
+      updateGlobalUI();
+
+      // 3 exercicis de pintar + 2 exercicis d'identificar
+      const paintShapes = ['circle', 'bar', 'circle'];
+      act1Data = [];
+
+      for (let i = 0; i < 3; i++) {
+        const den = [4, 5, 6, 8, 10][randInt(0, 4)];
+        const num = randInt(1, den - 1);
+        act1Data.push({
+          id: `a1_${i}`,
+          mode: 'paint',
+          shape: paintShapes[i],
+          num, den,
+          selected: new Set(),
+          solved: false
+        });
+      }
+
+      for (let i = 3; i < 5; i++) {
+        const den = [3, 4, 5, 6, 8, 9, 10][randInt(0, 6)];
+        const num = randInt(1, den - 1);
+        act1Data.push({
+          id: `a1_${i}`,
+          mode: 'identify',
+          shape: i === 3 ? 'circle' : 'bar',
+          num, den,
+          solved: false
+        });
+      }
+
+      renderAct1();
+    }
+
+    function renderAct1() {
+      const container = document.getElementById('act1-container');
+      container.innerHTML = "";
+
+      act1Data.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = "card-box rounded-3xl p-6 flex flex-col justify-between space-y-4";
+
+        if (item.mode === 'paint') {
+          const visualHTML = item.shape === 'circle'
+            ? createCircleSVG(item.den, 0, 150, item.id, item.selected)
+            : createBarHTML(item.den, 0, item.id, item.selected);
+
+          card.innerHTML = `
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full bg-orange-100 text-coralDark font-extrabold text-xs">Exercici ${idx + 1} · Pinta</span>
+                <span class="text-xs font-bold text-slate-500">Fes clic sobre les porcions</span>
+              </div>
+              <p class="text-base font-bold text-slate-800">
+                Pinta la fracció ${fractionHTML(item.num, item.den, "text-xl text-navy mx-1")} (${readFractionCatalan(item.num, item.den)}):
+              </p>
+              <div id="visual_${item.id}" class="py-3 flex justify-center items-center min-h-[160px] bg-slate-50 rounded-2xl border border-slate-200">
+                ${visualHTML}
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button onclick="checkAct1('${item.id}')" class="w-full py-3 rounded-2xl bg-navy hover:bg-navyDark text-white font-extrabold text-sm shadow transition">
+                ✅ Comprova la figura
+              </button>
+              <div id="fb_${item.id}" class="text-sm font-bold min-h-[24px] text-center"></div>
+            </div>
+          `;
+        } else {
+          const visualHTML = item.shape === 'circle'
+            ? createCircleSVG(item.den, item.num, 150)
+            : createBarHTML(item.den, item.num);
+
+          card.innerHTML = `
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full bg-blue-100 text-navy font-extrabold text-xs">Exercici ${idx + 1} · Identifica</span>
+                <span class="text-xs font-bold text-slate-500">Escriu la fracció</span>
+              </div>
+              <p class="text-base font-bold text-slate-800">Quina fracció representa la part pintada de taronja?</p>
+              <div class="py-3 flex justify-center items-center min-h-[160px] bg-slate-50 rounded-2xl border border-slate-200">
+                ${visualHTML}
+              </div>
+              <div class="flex items-center justify-center gap-3 pt-1">
+                <div class="flex flex-col items-center w-20">
+                  <input id="in_num_${item.id}" type="number" min="1" max="12" placeholder="?" class="w-16 h-12 text-center font-display font-bold text-xl border-2 border-navy rounded-xl">
+                  <div class="w-full h-1 bg-navy my-1.5 rounded"></div>
+                  <input id="in_den_${item.id}" type="number" min="1" max="12" placeholder="?" class="w-16 h-12 text-center font-display font-bold text-xl border-2 border-navy rounded-xl">
+                </div>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button onclick="checkAct1('${item.id}')" class="w-full py-3 rounded-2xl bg-navy hover:bg-navyDark text-white font-extrabold text-sm shadow transition">
+                ✅ Comprova la resposta
+              </button>
+              <div id="fb_${item.id}" class="text-sm font-bold min-h-[24px] text-center"></div>
+            </div>
+          `;
+        }
+        container.appendChild(card);
+      });
+    }
+
+    function toggleAct1Slice(id, sliceIdx) {
+      const item = act1Data.find(x => x.id === id);
+      if (!item || item.solved) return;
+      if (item.selected.has(sliceIdx)) item.selected.delete(sliceIdx);
+      else item.selected.add(sliceIdx);
+
+      const box = document.getElementById(`visual_${id}`);
+      box.innerHTML = item.shape === 'circle'
+        ? createCircleSVG(item.den, 0, 150, item.id, item.selected)
+        : createBarHTML(item.den, 0, item.id, item.selected);
+    }
+
+    function checkAct1(id) {
+      const item = act1Data.find(x => x.id === id);
+      const fb = document.getElementById(`fb_${id}`);
+      if (!item) return;
+
+      if (item.mode === 'paint') {
+        const count = item.selected.size;
+        if (count === item.num) {
+          fb.innerHTML = `<span class="text-mintDark">🎉 Molt bé! Has pintat ${count} de les ${item.den} parts iguals.</span>`;
+          if (!item.solved) { item.solved = true; scores.act1++; updateGlobalUI(); }
+        } else {
+          fb.innerHTML = `<span class="text-coralDark">❌ Has pintat ${count} parts, però el numerador demana pintar-ne ${item.num}.</span>`;
+        }
+      } else {
+        const uNum = parseInt(document.getElementById(`in_num_${id}`).value, 10);
+        const uDen = parseInt(document.getElementById(`in_den_${id}`).value, 10);
+        if (uNum === item.num && uDen === item.den) {
+          fb.innerHTML = `<span class="text-mintDark">🎉 Exacte! Hi ha ${item.num} parts pintades d'un total de ${item.den}.</span>`;
+          if (!item.solved) { item.solved = true; scores.act1++; updateGlobalUI(); }
+        } else {
+          fb.innerHTML = `<span class="text-coralDark">❌ Revisa-ho: compta les parts taronja (numerador) i totes les parts iguals (denominador).</span>`;
+        }
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. ACTIVITAT 2: COMPARACIÓ I ORDENACIÓ (5 PARELLES + 1 ORDRE = 6)
+    // -----------------------------------------------------------------------
+    let act2Pairs = [];
+    let act2Order = { items: [], chosen: [], solved: false };
+
+    function generateAct2() {
+      scores.act2 = 0;
+      updateGlobalUI();
+
+      // 5 parelles variades: igual denominador, igual numerador, equivalents
+      const d1 = [5, 6, 7, 8][randInt(0, 3)];
+      const n1a = randInt(1, d1 - 2), n1b = n1a + 1;
+
+      const d2 = [6, 8, 9, 10][randInt(0, 3)];
+      const n2a = randInt(2, d2 - 1), n2b = randInt(1, n2a - 1);
+
+      const n3 = randInt(2, 4);
+      const d3a = n3 + 1, d3b = n3 + 3; // Igual numerador: més gran qui té denominador més petit
+
+      const eqBaseN = [1, 2][randInt(0, 1)], eqBaseD = eqBaseN === 1 ? 2 : 3;
+
+      const d5 = 8, n5a = randInt(2, 6), n5b = randInt(2, 6);
+
+      act2Pairs = [
+        { id: "p0", a: [n1a, d1], b: [n1b, d1], hint: "Mateix denominador: és més gran la fracció que té el numerador més gran.", solved: false },
+        { id: "p1", a: [n2a, d2], b: [n2b, d2], hint: "Mateix denominador: compara quantes porcions agafes en cada cas.", solved: false },
+        { id: "p2", a: [n3, d3a], b: [n3, d3b], hint: "Mateix numerador: com més trossos fem, més petits són! És més gran el denominador més petit.", solved: false },
+        { id: "p3", a: [eqBaseN, eqBaseD], b: [eqBaseN * 2, eqBaseD * 2], hint: "Mira el dibuix: ocupen exactament la mateixa quantitat!", solved: false },
+        { id: "p4", a: [n5a, d5], b: [n5b, d5], hint: "Compara els numeradors ja que ambdues estan dividides en 8 parts.", solved: false }
+      ];
+
+      // Exercici d'ordenar 4 fraccions de menor a major (mateix denominador 8 o 10)
+      const ordDen = [8, 10][randInt(0, 1)];
+      const nums = [];
+      while (nums.length < 4) {
+        const cand = randInt(1, ordDen - 1);
+        if (!nums.includes(cand)) nums.push(cand);
+      }
+      act2Order = {
+        den: ordDen,
+        shuffled: [...nums],
+        sorted: [...nums].sort((a, b) => a - b),
+        chosen: [],
+        solved: false
+      };
+
+      renderAct2();
+    }
+
+    function renderAct2() {
+      const box = document.getElementById('act2-pairs-container');
+      box.innerHTML = "";
+
+      act2Pairs.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = "card-box rounded-3xl p-5 space-y-4";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-mintDark font-extrabold text-xs">Comparació ${idx + 1}</span>
+            <button onclick="togglePairHint('${p.id}')" class="px-3 py-1 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs">👁️ Veure dibuix</button>
+          </div>
+          <div class="flex items-center justify-center gap-4 sm:gap-6 py-2">
+            <div class="text-2xl sm:text-3xl text-navy bg-blue-50 px-5 py-3 rounded-2xl border border-blue-200">${fractionHTML(p.a[0], p.a[1])}</div>
+            <div class="flex gap-1.5">
+              ${['<', '=', '>'].map(sym => `
+                <button onclick="checkAct2Pair('${p.id}', '${sym}', this)" class="w-12 h-12 rounded-2xl bg-white border-2 border-slate-300 hover:border-navy hover:bg-blue-50 font-display font-bold text-2xl text-slate-800 shadow-sm transition">
+                  ${sym}
+                </button>
+              `).join('')}
+            </div>
+            <div class="text-2xl sm:text-3xl text-navy bg-blue-50 px-5 py-3 rounded-2xl border border-blue-200">${fractionHTML(p.b[0], p.b[1])}</div>
+          </div>
+          <div id="hint_${p.id}" class="hidden p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="grid grid-cols-2 gap-3">
+              <div>${createBarHTML(p.a[1], p.a[0])}</div>
+              <div>${createBarHTML(p.b[1], p.b[0])}</div>
+            </div>
+            <p class="text-xs text-slate-600 text-center font-semibold">💡 ${p.hint}</p>
+          </div>
+          <div id="fb_${p.id}" class="text-sm font-bold text-center min-h-[22px]"></div>
+        `;
+        box.appendChild(card);
+      });
+
+      renderAct2Order();
+    }
+
+    function togglePairHint(id) {
+      document.getElementById(`hint_${id}`).classList.toggle('hidden');
+    }
+
+    function checkAct2Pair(id, chosenSym, btnEl) {
+      const p = act2Pairs.find(x => x.id === id);
+      const fb = document.getElementById(`fb_${id}`);
+      const valA = p.a[0] / p.a[1];
+      const valB = p.b[0] / p.b[1];
+      const correctSym = Math.abs(valA - valB) < 0.0001 ? '=' : (valA < valB ? '<' : '>');
+
+      if (chosenSym === correctSym) {
+        btnEl.classList.add('bg-mint', 'text-white', 'border-mintDark');
+        fb.innerHTML = `<span class="text-mintDark">✅ Correcte! ${p.a[0]}/${p.a[1]} ${correctSym} ${p.b[0]}/${p.b[1]}</span>`;
+        if (!p.solved) { p.solved = true; scores.act2++; updateGlobalUI(); }
+      } else {
+        btnEl.classList.add('bg-red-100', 'border-red-400');
+        fb.innerHTML = `<span class="text-coralDark">❌ No és aquest signe. Fes clic a "Veure dibuix" per comparar-les!</span>`;
+      }
+    }
+
+    function renderAct2Order() {
+      const box = document.getElementById('act2-order-container');
+      box.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="px-3 py-1 rounded-full bg-navy text-white font-extrabold text-xs">Exercici 6 · Ordenació</span>
+              <h3 class="font-display text-xl font-bold text-navy mt-1">Ordena aquestes 4 fraccions de MENOR a MAJOR</h3>
+              <p class="text-sm text-slate-600">Fes clic sobre les fraccions començant per la més petita fins a la més gran.</p>
+            </div>
+            <button onclick="resetOrderChoice()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 self-start">↩️ Reinicia ordre</button>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-4 py-2">
+            ${act2Order.shuffled.map(n => {
+              const used = act2Order.chosen.includes(n);
+              return `<button onclick="pickOrderFraction(${n})" ${used ? 'disabled' : ''} class="px-6 py-4 rounded-2xl border-2 font-display text-2xl transition ${used ? 'bg-slate-100 border-slate-200 text-slate-300' : 'bg-white border-navy text-navy hover:bg-blue-50 shadow-sm'}">
+                ${fractionHTML(n, act2Order.den)}
+              </button>`;
+            }).join('')}
+          </div>
+
+          <div class="p-4 rounded-2xl bg-blue-50 border-2 border-dashed border-blue-300 flex flex-wrap items-center justify-center gap-3 min-h-[82px]">
+            ${act2Order.chosen.length === 0
+              ? `<span class="text-sm font-bold text-slate-400">Aquí apareixeran ordenades de menor a major...</span>`
+              : act2Order.chosen.map((n, i) => `
+                <span class="px-4 py-2 rounded-xl bg-white border-2 border-navy text-navy text-xl font-bold shadow-sm">${fractionHTML(n, act2Order.den)}</span>
+                ${i < act2Order.chosen.length - 1 ? '<span class="font-display font-bold text-xl text-coralDark">&lt;</span>' : ''}
+              `).join('')
+            }
+          </div>
+          <div id="fb_act2_order" class="text-sm font-bold text-center min-h-[24px]"></div>
+        </div>
+      `;
+    }
+
+    function pickOrderFraction(n) {
+      if (act2Order.solved || act2Order.chosen.includes(n)) return;
+      act2Order.chosen.push(n);
+      renderAct2Order();
+
+      if (act2Order.chosen.length === 4) {
+        const ok = act2Order.chosen.every((val, i) => val === act2Order.sorted[i]);
+        const fb = document.getElementById('fb_act2_order');
+        if (ok) {
+          fb.innerHTML = `<span class="text-mintDark">🎉 Perfecte! Les has ordenat correctament de menor a major!</span>`;
+          if (!act2Order.solved) { act2Order.solved = true; scores.act2++; updateGlobalUI(); }
+        } else {
+          fb.innerHTML = `<span class="text-coralDark">❌ L'ordre no és correcte. Prem "Reinicia ordre" i fixa't en els numeradors!</span>`;
+        }
+      }
+    }
+
+    function resetOrderChoice() {
+      if (act2Order.solved) return;
+      act2Order.chosen = [];
+      renderAct2Order();
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. ACTIVITAT 3: FRACCIÓ D'UNA QUANTITAT I CÀLCUL (4 + 4 = 8 EXERCICIS)
+    // -----------------------------------------------------------------------
+    let act3Qty = [];
+    let act3Ops = [];
+
+    function generateAct3() {
+      scores.act3 = 0;
+      updateGlobalUI();
+
+      // 4 exercicis de fracció d'una quantitat (amb visuals de grups)
+      const templates = [
+        { num: 2, den: 5, total: 20 },
+        { num: 3, den: 4, total: 16 },
+        { num: 2, den: 3, total: 12 },
+        { num: 3, den: 5, total: 15 }
+      ];
+      act3Qty = templates.map((t, i) => ({
+        id: `q_${i}`,
+        ...t,
+        ans: (t.total / t.den) * t.num,
+        solved: false
+      }));
+
+      // 4 exercicis de sumes i restes d'igual denominador
+      act3Ops = [];
+      for (let i = 0; i < 4; i++) {
+        const isSum = i % 2 === 0;
+        const den = [6, 8, 9, 10][i];
+        let a, b, res;
+        if (isSum) {
+          a = randInt(1, Math.floor(den / 2));
+          b = randInt(1, den - a);
+          res = a + b;
+        } else {
+          a = randInt(4, den - 1);
+          b = randInt(1, a - 1);
+          res = a - b;
+        }
+        act3Ops.push({
+          id: `op_${i}`,
+          op: isSum ? '+' : '−',
+          a, b, den, res,
+          solved: false
+        });
+      }
+
+      renderAct3();
+    }
+
+    function renderAct3() {
+      const qtyBox = document.getElementById('act3-qty-container');
+      qtyBox.innerHTML = "";
+
+      act3Qty.forEach((item, idx) => {
+        const perGroup = item.total / item.den;
+        let groupsHTML = "";
+        for (let g = 0; g < item.den; g++) {
+          const isSelectedGroup = g < item.num;
+          let dots = "";
+          for (let d = 0; d < perGroup; d++) {
+            dots += `<span class="w-3.5 h-3.5 rounded-full inline-block ${isSelectedGroup ? 'bg-coral' : 'bg-blue-300'}"></span>`;
+          }
+          groupsHTML += `<div class="p-2 rounded-xl border-2 ${isSelectedGroup ? 'border-coral bg-orange-50' : 'border-slate-200 bg-white'} flex flex-wrap gap-1 justify-center">${dots}</div>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = "card-box rounded-3xl p-5 space-y-4";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full bg-orange-100 text-coralDark font-extrabold text-xs">Quantitat ${idx + 1}</span>
+            <span class="text-xs font-bold text-slate-500">${item.total} fitxes en ${item.den} grups</span>
+          </div>
+          <div class="flex items-center justify-center gap-3 text-2xl font-bold text-navy">
+            ${fractionHTML(item.num, item.den)} <span>de ${item.total} =</span>
+            <input id="in_${item.id}" type="number" placeholder="?" class="w-20 h-12 text-center font-display text-2xl border-2 border-navy rounded-xl">
+          </div>
+          <div class="grid grid-cols-${item.den} gap-1.5">${groupsHTML}</div>
+          <button onclick="checkAct3Qty('${item.id}')" class="w-full py-2.5 rounded-xl bg-navy hover:bg-navyDark text-white font-extrabold text-sm">✅ Comprova</button>
+          <div id="fb_${item.id}" class="text-xs sm:text-sm font-bold text-center min-h-[22px]"></div>
+        `;
+        qtyBox.appendChild(card);
+      });
+
+      const opsBox = document.getElementById('act3-ops-container');
+      opsBox.innerHTML = "";
+
+      act3Ops.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = "card-box rounded-3xl p-5 space-y-4";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full bg-blue-100 text-navy font-extrabold text-xs">Operació ${idx + 1}</span>
+            <span class="text-xs font-bold text-slate-500">Igual denominador</span>
+          </div>
+          <div class="flex items-center justify-center gap-3 text-2xl text-navy py-2">
+            ${fractionHTML(item.a, item.den)}
+            <span class="font-display font-bold text-3xl text-coralDark">${item.op}</span>
+            ${fractionHTML(item.b, item.den)}
+            <span class="font-bold">=</span>
+            <div class="flex flex-col items-center w-16">
+              <input id="in_n_${item.id}" type="number" placeholder="?" class="w-14 h-11 text-center font-display text-xl border-2 border-navy rounded-xl">
+              <div class="w-full h-1 bg-navy my-1 rounded"></div>
+              <input id="in_d_${item.id}" type="number" placeholder="?" class="w-14 h-11 text-center font-display text-xl border-2 border-navy rounded-xl">
+            </div>
+          </div>
+          <button onclick="checkAct3Op('${item.id}')" class="w-full py-2.5 rounded-xl bg-navy hover:bg-navyDark text-white font-extrabold text-sm">✅ Comprova</button>
+          <div id="fb_${item.id}" class="text-xs sm:text-sm font-bold text-center min-h-[22px]"></div>
+        `;
+        opsBox.appendChild(card);
+      });
+    }
+
+    function checkAct3Qty(id) {
+      const item = act3Qty.find(x => x.id === id);
+      const val = parseInt(document.getElementById(`in_${id}`).value, 10);
+      const fb = document.getElementById(`fb_${id}`);
+      const step1 = item.total / item.den;
+
+      if (val === item.ans) {
+        fb.innerHTML = `<span class="text-mintDark">🎉 Molt bé! ${item.total} ÷ ${item.den} = ${step1}, i ${step1} × ${item.num} = ${item.ans}.</span>`;
+        if (!item.solved) { item.solved = true; scores.act3++; updateGlobalUI(); }
+      } else {
+        fb.innerHTML = `<span class="text-coralDark">❌ Pista: cada grup té ${step1} fitxes. Quantes n'hi ha en ${item.num} grups taronja?</span>`;
+      }
+    }
+
+    function checkAct3Op(id) {
+      const item = act3Ops.find(x => x.id === id);
+      const uN = parseInt(document.getElementById(`in_n_${id}`).value, 10);
+      const uD = parseInt(document.getElementById(`in_d_${id}`).value, 10);
+      const fb = document.getElementById(`fb_${id}`);
+
+      if (uN === item.res && uD === item.den) {
+        fb.innerHTML = `<span class="text-mintDark">🎉 Genial! Operem els numeradors (${item.a} ${item.op} ${item.b} = ${item.res}) i mantenim el denominador (${item.den}).</span>`;
+        if (!item.solved) { item.solved = true; scores.act3++; updateGlobalUI(); }
+      } else {
+        fb.innerHTML = `<span class="text-coralDark">❌ Recorda: quan tenen el mateix denominador, es deixa igual (${item.den}) i només s'operen els numeradors!</span>`;
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. ACTIVITAT 4: PROBLEMES DE LA VIDA QUOTIDIANA (4 PROBLEMES)
+    // -----------------------------------------------------------------------
+    let act4Problems = [];
+
+    function generateAct4() {
+      scores.act4 = 0;
+      updateGlobalUI();
+
+      act4Problems = [
+        {
+          id: "prob_0",
+          icon: "🍕",
+          title: "El sopar de pizza",
+          text: "En Marc ha demanat una pizza tallada en 8 porcions iguals. Ell se n'ha menjat 3 porcions i la seva germana Laia se n'ha menjat 2 porcions. Quina fracció de pizza queda encara a la caixa?",
+          visual: createBarHTML(8, 5),
+          type: "fraction",
+          ansNum: 3,
+          ansDen: 8,
+          explanation: "Entre tots dos s'han menjat 3/8 + 2/8 = 5/8 de pizza. Com que la pizza sencera són 8/8, queden 8/8 − 5/8 = 3/8.",
+          solved: false
+        },
+        {
+          id: "prob_1",
+          icon: "📚",
+          title: "El llibre d'aventures",
+          text: "La Júlia està llegint una novel·la de 240 pàgines. Aquesta setmana ja n'ha llegit les 3/4 parts. Quantes pàgines ha llegit en total?",
+          visual: `<div class="text-center text-sm font-bold text-navy bg-blue-50 py-2 px-3 rounded-xl">📖 Total: 240 pàgines · Llegides: 3/4 parts</div>`,
+          type: "number",
+          unit: "pàgines",
+          ans: 180,
+          explanation: "Dividim 240 entre 4 (240 ÷ 4 = 60 pàgines cada quart) i multipliquem per 3 (60 × 3 = 180 pàgines).",
+          solved: false
+        },
+        {
+          id: "prob_2",
+          icon: "🏃‍♀️",
+          title: "La cursa popular",
+          text: "En una cursa escolar de 600 metres, l'Arnau ja ha recorregut els 2/3 del circuit. Quants metres li falten encara per arribar a la meta?",
+          visual: `<div class="text-center text-sm font-bold text-mintDark bg-emerald-50 py-2 px-3 rounded-xl">🏁 Circuit total: 600 m · Recorreguts: 2/3</div>`,
+          type: "number",
+          unit: "metres",
+          ans: 200,
+          explanation: "Els 2/3 de 600 m són (600 ÷ 3) × 2 = 400 m recorreguts. Per tant, li falten 600 − 400 = 200 metres (que és 1/3).",
+          solved: false
+        },
+        {
+          id: "prob_3",
+          icon: "🍫",
+          title: "La caixa de bombons",
+          text: "A l'aniversari de l'Ona hi ha una caixa amb 30 bombons. Els 2/5 són de xocolata blanca i la resta són de xocolata amb llet. Quants bombons són de xocolata amb llet?",
+          visual: `<div class="text-center text-sm font-bold text-coralDark bg-orange-50 py-2 px-3 rounded-xl">🎁 Caixa de 30 bombons · 2/5 xocolata blanca</div>`,
+          type: "number",
+          unit: "bombons",
+          ans: 18,
+          explanation: "Els 2/5 de 30 són (30 ÷ 5) × 2 = 12 bombons blancs. La resta són 30 − 12 = 18 bombons de xocolata amb llet.",
+          solved: false
+        }
+      ];
+
+      renderAct4();
+    }
+
+    function renderAct4() {
+      const box = document.getElementById('act4-container');
+      box.innerHTML = "";
+
+      act4Problems.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = "card-box rounded-3xl p-6 flex flex-col justify-between space-y-4";
+
+        const inputArea = p.type === 'fraction'
+          ? `<div class="flex items-center justify-center gap-2">
+              <span class="font-bold text-slate-700">Resposta:</span>
+              <div class="flex flex-col items-center w-16">
+                <input id="in_n_${p.id}" type="number" placeholder="?" class="w-14 h-11 text-center font-display text-xl border-2 border-navy rounded-xl">
+                <div class="w-full h-1 bg-navy my-1 rounded"></div>
+                <input id="in_d_${p.id}" type="number" placeholder="?" class="w-14 h-11 text-center font-display text-xl border-2 border-navy rounded-xl">
+              </div>
+             </div>`
+          : `<div class="flex items-center justify-center gap-2">
+              <span class="font-bold text-slate-700">Resposta:</span>
+              <input id="in_${p.id}" type="number" placeholder="?" class="w-24 h-12 text-center font-display text-xl border-2 border-navy rounded-xl">
+              <span class="font-bold text-navy">${p.unit}</span>
+             </div>`;
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 font-extrabold text-xs">Problema ${idx + 1}</span>
+              <span class="text-3xl">${p.icon}</span>
+            </div>
+            <h3 class="font-display text-xl font-bold text-navy">${p.title}</h3>
+            <p class="text-sm sm:text-base text-slate-700 leading-relaxed">${p.text}</p>
+            <div>${p.visual}</div>
+          </div>
+          <div class="space-y-3 pt-2 border-t border-slate-100">
+            ${inputArea}
+            <button onclick="checkAct4('${p.id}')" class="w-full py-3 rounded-2xl bg-mint hover:bg-mintDark text-white font-extrabold text-sm shadow transition">
+              ✅ Comprova el problema
+            </button>
+            <div id="fb_${p.id}" class="text-xs sm:text-sm font-bold text-center min-h-[24px]"></div>
+          </div>
+        `;
+        box.appendChild(card);
+      });
+    }
+
+    function checkAct4(id) {
+      const p = act4Problems.find(x => x.id === id);
+      const fb = document.getElementById(`fb_${id}`);
+      let isOk = false;
+
+      if (p.type === 'fraction') {
+        const uN = parseInt(document.getElementById(`in_n_${id}`).value, 10);
+        const uD = parseInt(document.getElementById(`in_d_${id}`).value, 10);
+        isOk = (uN === p.ansNum && uD === p.ansDen);
+      } else {
+        const uVal = parseInt(document.getElementById(`in_${id}`).value, 10);
+        isOk = (uVal === p.ans);
+      }
+
+      if (isOk) {
+        fb.innerHTML = `<span class="text-mintDark">🎉 Excel·lent! ${p.explanation}</span>`;
+        if (!p.solved) { p.solved = true; scores.act4++; updateGlobalUI(); }
+      } else {
+        fb.innerHTML = `<span class="text-coralDark">❌ Encara no! Llegeix bé què ens demana la pregunta final i torna-ho a intentar.</span>`;
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. NOVA SECCIÓ: OPERACIONS AMB DIFERENT DENOMINADOR (LAB + 6 EXERCICIS)
+    // -----------------------------------------------------------------------
+    function gcd(a, b) {
+      return b === 0 ? a : gcd(b, a % b);
+    }
+    function lcm(a, b) {
+      return (a * b) / gcd(a, b);
+    }
+
+    let currentCalcOp = '+';
+
+    function setCalcOp(op) {
+      currentCalcOp = op;
+      const map = { '+': 'calc-op-plus', '-': 'calc-op-minus', '*': 'calc-op-mult' };
+      const colors = { '+': 'bg-coral', '-': 'bg-navy', '*': 'bg-plum' };
+
+      Object.keys(map).forEach(k => {
+        const btn = document.getElementById(map[k]);
+        if (k === op) {
+          btn.className = `calc-op-btn w-12 h-12 rounded-2xl ${colors[k]} text-white font-display font-bold text-2xl shadow`;
+        } else {
+          btn.className = "calc-op-btn w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-display font-bold text-2xl border border-slate-300";
+        }
+      });
+      updateDiffDenLab();
+    }
+
+    function updateDiffDenLab() {
+      const n1 = parseInt(document.getElementById('calc-n1').value, 10);
+      const d1 = parseInt(document.getElementById('calc-d1').value, 10);
+      const n2 = parseInt(document.getElementById('calc-n2').value, 10);
+      const d2 = parseInt(document.getElementById('calc-d2').value, 10);
+      const out = document.getElementById('diffden-lab-output');
+
+      if (currentCalcOp === '+' || currentCalcOp === '-') {
+        const commonDen = lcm(d1, d2);
+        const mult1 = commonDen / d1;
+        const mult2 = commonDen / d2;
+        const eqN1 = n1 * mult1;
+        const eqN2 = n2 * mult2;
+
+        if (currentCalcOp === '-' && eqN1 < eqN2) {
+          out.innerHTML = `
+            <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-center text-sm font-bold text-amber-900">
+              ⚠️ En aquesta resta, la primera fracció (${n1}/${d1} = ${eqN1}/${commonDen}) és més petita que la segona (${n2}/${d2} = ${eqN2}/${commonDen}). Prova de posar una primera fracció més gran!
+            </div>
+          `;
+          return;
+        }
+
+        const resN = currentCalcOp === '+' ? eqN1 + eqN2 : eqN1 - eqN2;
+        const opSym = currentCalcOp === '+' ? '+' : '−';
+        const totalBars = Math.max(1, Math.ceil(Math.max(eqN1, resN) / commonDen));
+
+        // Dibuix de barres dividides en commonDen
+        const makeSubBar = (painted, colorClass) => {
+          let html = '<div class="flex flex-wrap gap-2">';
+          let rem = painted;
+          for (let u = 0; u < totalBars; u++) {
+            const fill = Math.min(commonDen, rem);
+            rem -= fill;
+            html += `<div class="flex-1 min-w-[140px] flex border-2 border-navy rounded-lg overflow-hidden h-7">`;
+            for (let s = 0; s < commonDen; s++) {
+              html += `<div class="flex-1 border-r last:border-r-0 border-navy/40 ${s < fill ? colorClass : 'bg-white'}"></div>`;
+            }
+            html += `</div>`;
+          }
+          return html + '</div>';
+        };
+
+        out.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-2xl bg-white border-2 border-slate-200 space-y-2">
+              <div class="text-xs font-extrabold text-coralDark uppercase">Pas 1 · Denominador comú</div>
+              <p class="text-sm text-slate-700">El mínim comú múltiple entre <strong>${d1}</strong> i <strong>${d2}</strong> és <strong class="text-navy text-base">${commonDen}</strong>.</p>
+              <div class="text-xs text-slate-500">Dividim totes les barres en ${commonDen} parts iguals.</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white border-2 border-slate-200 space-y-2">
+              <div class="text-xs font-extrabold text-navy uppercase">Pas 2 · Fraccions equivalents</div>
+              <div class="text-sm font-bold text-slate-800 space-y-1">
+                <div>${n1}/${d1} <span class="text-xs text-slate-500">(×${mult1})</span> = <span class="text-coralDark">${eqN1}/${commonDen}</span></div>
+                <div>${n2}/${d2} <span class="text-xs text-slate-500">(×${mult2})</span> = <span class="text-navy">${eqN2}/${commonDen}</span></div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-mint space-y-2 flex flex-col justify-center items-center">
+              <div class="text-xs font-extrabold text-mintDark uppercase">Pas 3 · Resultat final</div>
+              <div class="flex items-center gap-2 text-2xl font-bold text-navy">
+                ${fractionHTML(eqN1, commonDen)} <span>${opSym}</span> ${fractionHTML(eqN2, commonDen)} <span>=</span>
+                <span class="text-mintDark text-3xl">${fractionHTML(resN, commonDen)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center text-xs font-bold">
+              <div><span class="block mb-1 text-coralDark">1a: ${eqN1}/${commonDen}</span>${makeSubBar(eqN1, 'bg-coral')}</div>
+              <div><span class="block mb-1 text-navy">2a: ${eqN2}/${commonDen}</span>${makeSubBar(eqN2, 'bg-blue-500')}</div>
+              <div><span class="block mb-1 text-mintDark">Resultat: ${resN}/${commonDen}</span>${makeSubBar(resN, 'bg-mint')}</div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Multiplicació: n1/d1 × n2/d2
+        const resN = n1 * n2;
+        const resD = d1 * d2;
+        const g = gcd(resN, resD);
+        const simpText = g > 1 ? ` (simplificada: ${resN / g}/${resD / g})` : "";
+
+        // Quadrícula d'àrea (d1 files x d2 columnes)
+        let gridCells = "";
+        for (let r = 0; r < d1; r++) {
+          for (let c = 0; c < d2; c++) {
+            const inRow = r < n1;
+            const inCol = c < n2;
+            let bg = "bg-white";
+            if (inRow && inCol) bg = "bg-plum text-white";
+            else if (inRow) bg = "bg-orange-200";
+            else if (inCol) bg = "bg-blue-200";
+            gridCells += `<div class="${bg} border border-navy/40 flex items-center justify-center text-xs font-bold">${inRow && inCol ? '✓' : ''}</div>`;
+          }
+        }
+
+        out.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div class="p-5 rounded-2xl bg-white border-2 border-purple-200 space-y-3">
+              <div class="text-xs font-extrabold text-plumDark uppercase">Multiplicació directa en línia recta</div>
+              <div class="flex items-center justify-center gap-3 text-2xl sm:text-3xl font-bold text-navy py-2">
+                ${fractionHTML(n1, d1)}
+                <span class="text-plumDark">×</span>
+                ${fractionHTML(n2, d2)}
+                <span>=</span>
+                ${fractionHTML(`${n1} × ${n2}`, `${d1} × ${d2}`, "text-lg text-slate-600")}
+                <span>=</span>
+                <span class="text-plumDark text-3xl">${fractionHTML(resN, resD)}</span>
+              </div>
+              <p class="text-xs text-slate-600 text-center font-semibold">
+                Significa calcular <strong>${n1}/${d1} de ${n2}/${d2}</strong>. Total de caselles: ${d1} × ${d2} = ${resD}; caselles doble pintades: ${n1} × ${n2} = ${resN}${simpText}.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-center space-y-2">
+              <span class="text-xs font-extrabold text-slate-600">Model d'àrea (${d1} files × ${d2} columnes = ${resD} parts)</span>
+              <div class="grid border-2 border-navy rounded-xl overflow-hidden w-48 h-32 shadow-sm" style="grid-template-columns: repeat(${d2}, minmax(0, 1fr)); grid-template-rows: repeat(${d1}, minmax(0, 1fr));">
+                ${gridCells}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // 6 EXERCICIS GUIATS (2 SUMES + 2 RESTES + 2 MULTIPLICACIONS)
+    let diffDenExercises = [];
+
+    function generateDiffDenExercises() {
+      scores.diffden = 0;
+      updateGlobalUI();
+
+      const sumBank = [
+        { n1: 1, d1: 2, n2: 1, d2: 4 },
+        { n1: 1, d1: 2, n2: 1, d2: 3 },
+        { n1: 1, d1: 3, n2: 1, d2: 6 },
+        { n1: 2, d1: 3, n2: 1, d2: 4 },
+        { n1: 1, d1: 4, n2: 2, d2: 5 },
+        { n1: 1, d1: 2, n2: 2, d2: 5 }
+      ].sort(() => Math.random() - 0.5).slice(0, 2);
+
+      const subBank = [
+        { n1: 3, d1: 4, n2: 1, d2: 2 },
+        { n1: 2, d1: 3, n2: 1, d2: 6 },
+        { n1: 4, d1: 5, n2: 1, d2: 2 },
+        { n1: 3, d1: 4, n2: 1, d2: 3 },
+        { n1: 5, d1: 6, n2: 1, d2: 2 },
+        { n1: 3, d1: 5, n2: 1, d2: 2 }
+      ].sort(() => Math.random() - 0.5).slice(0, 2);
+
+      const multBank = [
+        { n1: 1, d1: 2, n2: 1, d2: 3 },
+        { n1: 2, d1: 3, n2: 1, d2: 4 },
+        { n1: 1, d1: 2, n2: 3, d2: 5 },
+        { n1: 3, d1: 4, n2: 1, d2: 2 },
+        { n1: 2, d1: 5, n2: 2, d2: 3 },
+        { n1: 1, d1: 3, n2: 2, d2: 5 }
+      ].sort(() => Math.random() - 0.5).slice(0, 2);
+
+      diffDenExercises = [];
+
+      sumBank.forEach((p, i) => {
+        const cd = lcm(p.d1, p.d2);
+        const eq1 = p.n1 * (cd / p.d1);
+        const eq2 = p.n2 * (cd / p.d2);
+        diffDenExercises.push({
+          id: `dd_sum_${i}`,
+          type: '+',
+          ...p, cd, eq1, eq2,
+          resN: eq1 + eq2,
+          resD: cd,
+          solved: false
+        });
+      });
+
+      subBank.forEach((p, i) => {
+        const cd = lcm(p.d1, p.d2);
+        const eq1 = p.n1 * (cd / p.d1);
+        const eq2 = p.n2 * (cd / p.d2);
+        diffDenExercises.push({
+          id: `dd_sub_${i}`,
+          type: '-',
+          ...p, cd, eq1, eq2,
+          resN: eq1 - eq2,
+          resD: cd,
+          solved: false
+        });
+      });
+
+      multBank.forEach((p, i) => {
+        diffDenExercises.push({
+          id: `dd_mul_${i}`,
+          type: '*',
+          ...p,
+          resN: p.n1 * p.n2,
+          resD: p.d1 * p.d2,
+          solved: false
+        });
+      });
+
+      renderDiffDenExercises();
+    }
+
+    function renderDiffDenExercises() {
+      const box = document.getElementById('diffden-exercises-container');
+      box.innerHTML = "";
+
+      diffDenExercises.forEach((ex, idx) => {
+        const card = document.createElement('div');
+        card.className = "card-box rounded-3xl p-6 flex flex-col justify-between space-y-4";
+
+        if (ex.type === '+' || ex.type === '-') {
+          const isSum = ex.type === '+';
+          const badgeClass = isSum ? "bg-orange-100 text-coralDark" : "bg-blue-100 text-navy";
+          const opSym = isSum ? "+" : "−";
+
+          card.innerHTML = `
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full ${badgeClass} font-extrabold text-xs">Exercici ${idx + 1} · ${isSum ? 'Suma' : 'Resta'}</span>
+                <button onclick="document.getElementById('dd_hint_${ex.id}').classList.toggle('hidden')" class="px-2.5 py-1 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs">💡 Pista</button>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 py-2 bg-slate-50 rounded-2xl border border-slate-200 p-3">
+                <!-- Fraccions originals -->
+                <div class="text-xl font-bold text-navy">${fractionHTML(ex.n1, ex.d1)}</div>
+                <span class="font-display font-bold text-2xl text-coralDark">${opSym}</span>
+                <div class="text-xl font-bold text-navy">${fractionHTML(ex.n2, ex.d2)}</div>
+                <span class="font-bold text-xl">=</span>
+
+                <!-- Fraccions equivalents intermèdies -->
+                <div class="flex flex-col items-center w-14">
+                  <input id="eq1_n_${ex.id}" type="number" placeholder="?" class="w-12 h-9 text-center font-display font-bold text-base border-2 border-amber-400 rounded-lg bg-white">
+                  <div class="w-full h-0.5 bg-navy my-1"></div>
+                  <input id="eq1_d_${ex.id}" type="number" placeholder="?" class="w-12 h-9 text-center font-display font-bold text-base border-2 border-amber-400 rounded-lg bg-white">
+                </div>
+                <span class="font-display font-bold text-xl text-coralDark">${opSym}</span>
+                <div class="flex flex-col items-center w-14">
+                  <input id="eq2_n_${ex.id}" type="number" placeholder="?" class="w-12 h-9 text-center font-display font-bold text-base border-2 border-amber-400 rounded-lg bg-white">
+                  <div class="w-full h-0.5 bg-navy my-1"></div>
+                  <input id="eq2_d_${ex.id}" type="number" placeholder="?" class="w-12 h-9 text-center font-display font-bold text-base border-2 border-amber-400 rounded-lg bg-white">
+                </div>
+                <span class="font-bold text-xl">=</span>
+
+                <!-- Resultat final -->
+                <div class="flex flex-col items-center w-16">
+                  <input id="res_n_${ex.id}" type="number" placeholder="?" class="w-14 h-10 text-center font-display font-bold text-lg border-2 border-mint rounded-xl bg-emerald-50/40">
+                  <div class="w-full h-1 bg-navy my-1 rounded"></div>
+                  <input id="res_d_${ex.id}" type="number" placeholder="?" class="w-14 h-10 text-center font-display font-bold text-lg border-2 border-mint rounded-xl bg-emerald-50/40">
+                </div>
+              </div>
+
+              <div id="dd_hint_${ex.id}" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 font-semibold">
+                Busca un denominador comú per a <strong>${ex.d1}</strong> i <strong>${ex.d2}</strong> (per exemple, <strong>${ex.cd}</strong>). Converteix cada fracció al denominador ${ex.cd} i després ${isSum ? 'suma' : 'resta'} els numeradors!
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <button onclick="checkDiffDenEx('${ex.id}')" class="w-full py-2.5 rounded-xl bg-navy hover:bg-navyDark text-white font-extrabold text-sm">✅ Comprova els passos</button>
+              <div id="fb_${ex.id}" class="text-xs sm:text-sm font-bold text-center min-h-[22px]"></div>
+            </div>
+          `;
+        } else {
+          // Multiplicació
+          card.innerHTML = `
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full bg-purple-100 text-plumDark font-extrabold text-xs">Exercici ${idx + 1} · Multiplicació</span>
+                <button onclick="document.getElementById('dd_hint_${ex.id}').classList.toggle('hidden')" class="px-2.5 py-1 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs">💡 Pista</button>
+              </div>
+
+              <div class="flex items-center justify-center gap-4 py-3 bg-purple-50/50 rounded-2xl border border-purple-200">
+                <div class="text-2xl font-bold text-navy">${fractionHTML(ex.n1, ex.d1)}</div>
+                <span class="font-display font-bold text-3xl text-plumDark">×</span>
+                <div class="text-2xl font-bold text-navy">${fractionHTML(ex.n2, ex.d2)}</div>
+                <span class="font-bold text-2xl">=</span>
+                <div class="flex flex-col items-center w-16">
+                  <input id="res_n_${ex.id}" type="number" placeholder="?" class="w-14 h-11 text-center font-display font-bold text-xl border-2 border-plum rounded-xl bg-white">
+                  <div class="w-full h-1 bg-navy my-1 rounded"></div>
+                  <input id="res_d_${ex.id}" type="number" placeholder="?" class="w-14 h-11 text-center font-display font-bold text-xl border-2 border-plum rounded-xl bg-white">
+                </div>
+              </div>
+
+              <div id="dd_hint_${ex.id}" class="hidden p-3 rounded-xl bg-purple-50 border border-purple-200 text-xs text-plumDark font-semibold">
+                Multiplica en línia recta: a dalt <strong>${ex.n1} × ${ex.n2}</strong> i a baix <strong>${ex.d1} × ${ex.d2}</strong>!
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <button onclick="checkDiffDenEx('${ex.id}')" class="w-full py-2.5 rounded-xl bg-plum hover:bg-plumDark text-white font-extrabold text-sm">✅ Comprova la multiplicació</button>
+              <div id="fb_${ex.id}" class="text-xs sm:text-sm font-bold text-center min-h-[22px]"></div>
+            </div>
+          `;
+        }
+        box.appendChild(card);
+      });
+    }
+
+    function checkDiffDenEx(id) {
+      const ex = diffDenExercises.find(x => x.id === id);
+      const fb = document.getElementById(`fb_${id}`);
+      const rN = parseInt(document.getElementById(`res_n_${id}`).value, 10);
+      const rD = parseInt(document.getElementById(`res_d_${id}`).value, 10);
+
+      if (ex.type === '+' || ex.type === '-') {
+        const e1N = parseInt(document.getElementById(`eq1_n_${id}`).value, 10);
+        const e1D = parseInt(document.getElementById(`eq1_d_${id}`).value, 10);
+        const e2N = parseInt(document.getElementById(`eq2_n_${id}`).value, 10);
+        const e2D = parseInt(document.getElementById(`eq2_d_${id}`).value, 10);
+
+        // Permetem qualsevol múltiple comú vàlid (ex: 6 o 12) sempre que les equivalents i el resultat siguin coherents
+        const validCommonDen = e1D && e1D === e2D && e1D % ex.d1 === 0 && e1D % ex.d2 === 0;
+        const validEq1 = validCommonDen && e1N === ex.n1 * (e1D / ex.d1);
+        const validEq2 = validCommonDen && e2N === ex.n2 * (e2D / ex.d2);
+        const expectedResN = ex.type === '+' ? e1N + e2N : e1N - e2N;
+        const validRes = validEq1 && validEq2 && rD === e1D && rN === expectedResN;
+
+        if (validRes) {
+          fb.innerHTML = `<span class="text-mintDark">🎉 Fantàstic! ${ex.n1}/${ex.d1} = ${e1N}/${e1D}, ${ex.n2}/${ex.d2} = ${e2N}/${e2D} → resultat ${rN}/${rD}.</span>`;
+          if (!ex.solved) { ex.solved = true; scores.diffden++; updateGlobalUI(); }
+        } else if (!validCommonDen) {
+          fb.innerHTML = `<span class="text-coralDark">❌ Primer posa el mateix denominador comú a les dues fraccions del mig (ex: ${ex.cd}).</span>`;
+        } else if (!validEq1 || !validEq2) {
+          fb.innerHTML = `<span class="text-coralDark">❌ Revisa els numeradors de les fraccions equivalents! Multiplica a dalt pel mateix nombre que a baix.</span>`;
+        } else {
+          fb.innerHTML = `<span class="text-coralDark">❌ Les fraccions equivalents estan bé, però revisa ${ex.type === '+' ? 'la suma' : 'la resta'} final!</span>`;
+        }
+      } else {
+        // Multiplicació (acceptem resultat directe o simplificat)
+        const directOk = rN === ex.resN && rD === ex.resD;
+        const simpOk = rD > 0 && (rN * ex.resD === rD * ex.resN);
+        if (directOk || simpOk) {
+          fb.innerHTML = `<span class="text-mintDark">🎉 Perfecte! ${ex.n1}×${ex.n2} = ${ex.resN} i ${ex.d1}×${ex.d2} = ${ex.resD}.</span>`;
+          if (!ex.solved) { ex.solved = true; scores.diffden++; updateGlobalUI(); }
+        } else {
+          fb.innerHTML = `<span class="text-coralDark">❌ Recorda: multiplica numerador × numerador (${ex.n1}×${ex.n2}) i denominador × denominador (${ex.d1}×${ex.d2}).</span>`;
+        }
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // REINICI GENERAL
+    // -----------------------------------------------------------------------
+    function resetAllExercises() {
+      generateAct1();
+      generateAct2();
+      generateAct3();
+      generateDiffDenExercises();
+      generateAct4();
+    }
+
+    // Inicialització en carregar la pàgina
+    window.addEventListener('DOMContentLoaded', () => {
+      const today = new Date();
+      document.getElementById('diploma-date').textContent = `Data: ${today.toLocaleDateString('ca-ES')}`;
+      renderLab();
+      updateDiffDenLab();
+      resetAllExercises();
+    });
+  </script>
+</body>
+</html>
